@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=Proyecto1.s
+SOURCEFILES_QUOTED_IF_SPACED=
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/Proyecto1.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/Proyecto1.o.d
+OBJECTFILES_QUOTED_IF_SPACED=
+POSSIBLE_DEPFILES=
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/Proyecto1.o
+OBJECTFILES=
 
 # Source Files
-SOURCEFILES=Proyecto1.s
+SOURCEFILES=
 
 
 
@@ -94,23 +94,7 @@ MP_PROCESSOR_OPTION=PIC16F887
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: pic-as-assembler
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/Proyecto1.o: Proyecto1.s  nbproject/Makefile-${CND_CONF}.mk 
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Proyecto1.o 
-	${MP_AS} -mcpu=PIC16F887 -c \
-	-o ${OBJECTDIR}/Proyecto1.o \
-	Proyecto1.s \
-	 -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
-	
 else
-${OBJECTDIR}/Proyecto1.o: Proyecto1.s  nbproject/Makefile-${CND_CONF}.mk 
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/Proyecto1.o 
-	${MP_AS} -mcpu=PIC16F887 -c \
-	-o ${OBJECTDIR}/Proyecto1.o \
-	Proyecto1.s \
-	 -msummary=+mem,-psect,-class,-hex,-file,-sha1,-sha256,-xml,-xmlfull -fmax-errors=20 -mwarn=0 -xassembler-with-cpp
-	
 endif
 
 # ------------------------------------------------------------------------------------
