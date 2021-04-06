@@ -2753,6 +2753,13 @@ main:
     movlw 35
     movwf SEMA3
 
+    movlw 10
+    movwf Tsema1
+    movlw 10
+    movwf Tsema2
+    movlw 10
+    movwf Tsema3
+
 
     bsf CONT,0
 
@@ -2997,6 +3004,8 @@ mood3:
     goto loop
 
 mood4:
+    clrf dise+6
+    clrf dise+7
     bsf PORTE,0
     bsf PORTE,1
     bsf PORTE,2
@@ -3018,15 +3027,27 @@ acep:
     btfsc PORTB,1
     goto $-1
     clrf mood
+    bcf CONT+1,0
+    clrf CONT
+    bsf CONT,0
+    clrf PORTA
+    bcf PORTB,3
+
 
     movf Tsema1,W
     movwf TVIA
+    movwf SEMA1
+    movwf SEMA2
 
     movf Tsema2,W
     movwf TVIA+1
+    addwf TVIA,W
+    movwf SEMA3
 
     movf Tsema3,W
     movwf TVIA+2
+
+
     goto loop
 
 rech:
