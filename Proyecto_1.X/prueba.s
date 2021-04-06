@@ -59,27 +59,29 @@ GLOBAL Tsema3,INTER,CONT,TVIA
     W_TEM:	DS 1
     ESTATUS:	DS 1
     
-//<editor-fold defaultstate="collapsed" desc="Variables">
 PSECT udata_bank0
-var:      DS 3
-banderas: DS 2
-dise:     DS 8
-mood:     DS 1
-UNI:      DS 6
-DECE:     DS 6
-PRUEBA:   DS 1
-SEMA1:    DS 1
-SEMA2:    DS 1
-SEMA3:    DS 1
-Tsema1:   DS 1
-Tsema2:   DS 1
-Tsema3:   DS 1
-INTER:    DS 1
-CONT:     DS 3
-TVIA:     DS 3
-    //</editor-fold>
-
-   
+    var:      DS 3
+    banderas: DS 2
+    dise:     DS 8
+    mood:     DS 1
+    UNI:      DS 6
+    DECE:     DS 6
+    PRUEBA:   DS 1
+    SEMA1:    DS 1
+    SEMA2:    DS 1
+    SEMA3:    DS 1
+    Tsema1:   DS 1
+    Tsema2:   DS 1
+    Tsema3:   DS 1
+    INTER:    DS 1
+    CONT:     DS 3
+    TVIA:     DS 3
+    
+    
+    
+    
+ 
+    
   
   PSECT resVect, class=CODE, abs, delta=2
   ;--------------vector reset---------------------------------------------------
@@ -101,11 +103,11 @@ PSECT intVect, class=CODE, abs, delta=2
     btfsc   T0IF	    ; revisar bandera de Timer0
     call    inttimer	    ;interrupcion del timer
     
-    btfsc   TMR1IF	    ; revisar bandera de Timer1
-    call    inttimer1	    ;interrupcion del timer
+    btfsc TMR1IF	    ; revisar bandera de Timer1
+    call inttimer1	    ;interrupcion del timer
     
     btfsc   TMR2IF	    ; revisar bandera de Timer2
-    call    inttimer2	    ;interrupcion del timer
+    call inttimer2	    ;interrupcion del timer
     
 pop:
     swapf   ESTATUS, W
@@ -224,17 +226,12 @@ sigdis0:
     //</editor-fold>
  
 	
-//<editor-fold defaultstate="collapsed" desc="Tiempo decrementado">
 inttimer1:
     reiniciarT1		;reiniciar para colocar un valor nuevo	
     decf SEMA1, F		; incrementar en el contador
     decf SEMA2, F
     decf SEMA3, F
     return
-    //</editor-fold>
-
-    
-//<editor-fold defaultstate="collapsed" desc="Intermitente">
 inttimer2:
     reiniciarT2		; reiniciar
     
@@ -246,15 +243,12 @@ OFF:
 ON:
     bcf	    INTER,0	; limpiar la bandera
     return
-    //</editor-fold>
-
 
     
     
-//<editor-fold defaultstate="collapsed" desc="Tabla">
   PSECT code, delta=2, abs
-    ORG 100h	; posicion para la tabla 
-tabla: 
+  ORG 100h	; posicion para la tabla 
+  tabla: 
     clrf    PCLATH
     bsf	    PCLATH,0 ; PCLATH = 01
     andlw   0x0f
@@ -275,8 +269,6 @@ tabla:
     retlw   01011110B ;D
     retlw   01111001B ;E
     retlw   01110001B ;F
-    //</editor-fold>
-
     
   /*PSECT code, delta=2, abs
     ORG 114h */
@@ -304,64 +296,66 @@ main:
     movlw   35
     movwf   SEMA3
     
-  
     bsf	    CONT,0
     
    banksel PORTA    
     ;----------loop principal---------------------------------------------------
 loop: 
 
-    btfsc   PORTB,0
+    btfss   PORTB,0
     call    cambiarmodo
     
     call    VALSEMA
     call    DISPSEMA
 
-    btfsc   CONT,0
-    call    V1
+;    btfsc   CONT,0
+;    call    V1
+;    
+;    btfsc   CONT,1
+;    call    VI1
+;    
+;    btfsc   CONT,2
+;    call    A1
+;    
+;    btfsc   CONT,3
+;    call    V2
+;    
+;    btfsc   CONT,4
+;    call    VI2
+;    
+;    btfsc   CONT,5
+;    call    A2 
+;    
+;    btfsc   CONT,6
+;    call    V3
+;    
+;    btfsc   CONT,7
+;    call    VI3
+;    
+;    btfsc   CONT+1,0
+;    call    A3
     
-    btfsc   CONT,1
-    call    VI1
-    
-    btfsc   CONT,2
-    call    A1
-    
-    btfsc   CONT,3
-    call    V2
-    
-    btfsc   CONT,4
-    call    VI2
-    
-    btfsc   CONT,5
-    call    A2 
-    
-    btfsc   CONT,6
-    call    V3
-    
-    btfsc   CONT,7
-    call    VI3
-    
-    btfsc   CONT+1,0
-    call    A3
-    
-   btfss    mood,0
-    goto    moodA
-    goto    moodB
+;    btfsc   mood,0
+;    goto    moodA
+;    goto    moodB
     
 
 
     
 //<editor-fold defaultstate="collapsed" desc="Cambio de modo">
 cambiarmodo:
-    btfsc	PORTB,0
+    btfss	PORTB,0
     goto	$-1
-    incf	mood
+    incf	var
+    call	lims
+    
+    movf	var,W
     return
     //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="INC/DEC">
 inc:
-    btfsc   PORTB,1
+    btfss   PORTB,1
     goto    $-1
     incf    var
     call    lims
@@ -370,7 +364,7 @@ inc:
     return
     
 decr:
-    btfsc   PORTB,2
+    btfss   PORTB,2
     goto    $-1
     decf    var
     call    limi
@@ -382,7 +376,6 @@ decr:
 
 //<editor-fold defaultstate="collapsed" desc="limites">
 limi:
- 
     movlw   9
     subwf   var,W
     
@@ -401,7 +394,7 @@ lims:
     subwf    var,W
    
     btfsc    STATUS,2
-    goto     ofl
+    goto	    ofl
    
     return
    
@@ -411,181 +404,179 @@ ofl:
     return
     //</editor-fold>
  
-//<editor-fold defaultstate="collapsed" desc="VM">
-moodA:
-    btfsc   mood,1
-    goto    moodD
-    goto    moodC
-    goto    loop
-    
-moodB:
-    btfsc   mood,1
-    goto    moodE
-    goto    moodF
-    goto    loop
-    
-moodC:
-    btfsc   mood,2
-    goto    mood4
-    goto    mood0
-    goto    loop
-    
-moodD:
-    btfsc   mood,2
-    goto    moodm
-    goto    mood2
-    goto    loop
-  
-moodE:
-    btfsc   mood,2
-    goto    moodm
-    goto    mood3
-    goto    loop
-    
-moodF:
-    btfsc   mood,2
-    goto    moodm
-    goto    mood1
-    goto    loop
-    //</editor-fold>
-    
-//<editor-fold defaultstate="collapsed" desc="MODOS">
-mood0:
-    bcf		    PORTE,0
-    bcf		    PORTE,1
-    bcf		    PORTE,2
-    
-    clrf	    dise+6
-    clrf	    dise+7
-    goto	    loop
-    
-mood1:
-    
-    movf	    Tsema1,W
-    movwf	    var
-    bsf		    PORTE,0
-    bcf		    PORTE,1
-    bcf		    PORTE,2	
-    
-    btfsc	    PORTB,1
-    call	    inc
-    
-    btfsc	    PORTB,2
-    call	    decr
-    
-    movf	    var,W
-    movwf	    Tsema1
-    movwf	    PRUEBA
-    
-    
-    call	    divisor
-    
-    movf	    UNI,W
-    movwf	    UNI+4
-    
-    movf	    DECE,W
-    movwf	    DECE+4
-    
-    
-    call	    DISPMOOD
-    goto	    loop
-mood2:
-    movf	    Tsema2,W
-    movwf	    var
-    bcf	    PORTE,0
-    bsf	    PORTE,1
-    bcf	    PORTE,2
-    
-    btfsc   PORTB,1
-    call    inc
-    
-    btfsc   PORTB,2
-    call    decr
-    
-    movf    var,W
-    movwf   Tsema2
-    movwf   PRUEBA
-    
-    
-    call    divisor
-    
-    movf    UNI,W
-    movwf   UNI+4
-    
-    movf    DECE,W
-    movwf   DECE+4
-    
-    call    DISPMOOD
-    goto    loop
-    
-mood3:
-    movf    Tsema3,W
-    movwf   var
-    bcf	    PORTE,0
-    bcf	    PORTE,1
-    bsf	    PORTE,2
-    
-    btfsc   PORTB,1
-    call    inc
-    
-    btfsc   PORTB,2
-    call    decr
-    
-    movf    var,W
-    movwf   Tsema3
-    movwf   PRUEBA
-    
-    
-    call divisor
-    
-    movf    UNI,W
-    movwf   UNI+4
-    
-    movf    DECE,W
-    movwf   DECE+4
-    
-    call    DISPMOOD
-    goto    loop
-    
-mood4:
-    bsf	    PORTE,0
-    bsf	    PORTE,1
-    bsf	    PORTE,2
-    
-    btfsc   PORTB,1
-    call    acep
-    
-    btfsc   PORTB,2
-    call    rech
-    
-    goto loop
-    
-    
-moodm:
-    clrf    mood
-    goto    loop
-    
-acep:
-    btfsc   PORTB,1
-    goto    $-1
-    clrf    mood
-    
-    movf    Tsema1,W
-    movwf   TVIA
-    
-    movf    Tsema2,W
-    movwf   TVIA+1
-    
-    movf    Tsema3,W
-    movwf   TVIA+2
-    goto    loop
-    
-rech:
-    btfsc   PORTB,2
-    goto    $-1
-    clrf    mood
-    goto    loop
-   //</editor-fold>
+;//<editor-fold defaultstate="collapsed" desc="VM">
+;moodA:
+;    btfsc   mood,1
+;    goto    moodD
+;    goto    moodC
+;    goto    loop
+;    
+;moodB:
+;    btfsc   mood,1
+;    goto    moodE
+;    goto    moodF
+;    goto    loop
+;    
+;moodC:
+;    btfsc   mood,2
+;    goto    mood4
+;    goto    mood0
+;    goto    loop
+;    
+;moodD:
+;    btfsc   mood,2
+;    goto    moodm
+;    goto    mood2
+;    goto    loop
+;  
+;moodE:
+;    btfsc   mood,2
+;    goto    moodm
+;    goto    mood3
+;    goto    loop
+;    
+;moodF:
+;    btfsc   mood,2
+;    goto    moodm
+;    goto    mood1
+;    goto    loop
+;    //</editor-fold>
+;
+;//<editor-fold defaultstate="collapsed" desc="MODOS">
+;mood0:
+;    bcf	    PORTE,0
+;    bcf	    PORTE,1
+;    bcf	    PORTE,2
+;    
+;    clrf    dise+6
+;    clrf    dise+7
+;    goto    loop
+;    
+;mood1:
+;    movf    Tsema1,W
+;    movwf   var
+;    bsf	    PORTE,0
+;    bcf	    PORTE,1
+;    bcf	    PORTE,2
+;    
+;    btfss   PORTB,1
+;    call    inc
+;    
+;    btfss   PORTB,2
+;    call    decr
+;    
+;    movf    var,W
+;    movwf   Tsema1
+;    movwf   PRUEBA
+;    
+;    
+;    call divisor
+;    
+;    movf    UNI,W
+;    movwf   UNI+4
+;    
+;    movf    DECE,W
+;    movwf   DECE+4
+;    
+;    ;call    disp_mood_on
+;    goto    loop
+;mood2:
+;    movf    Tsema2,W
+;    movwf   var
+;    bcf	    PORTE,0
+;    bsf	    PORTE,1
+;    bcf	    PORTE,2
+;    
+;    btfss   PORTB,1
+;    call    inc
+;    
+;    btfss   PORTB,2
+;    call    decr
+;    
+;    movf    var,W
+;    movwf   Tsema2
+;    movwf   PRUEBA
+;    
+;    
+;    call    divisor
+;    
+;    movf    UNI,W
+;    movwf   UNI+4
+;    
+;    movf    DECE,W
+;    movwf   DECE+4
+;    
+;   ; call    disp_mood_on
+;    goto    loop
+;    
+;mood3:
+;    movf    Tsema3,W
+;    movwf   var
+;    bcf	    PORTE,0
+;    bcf	    PORTE,1
+;    bsf	    PORTE,2
+;    
+;    btfss   PORTB,1
+;    call    inc
+;    
+;    btfss   PORTB,2
+;    call    decr
+;    
+;    movf    var,W
+;    movwf   Tsema3
+;    movwf   PRUEBA
+;    
+;    
+;    call divisor
+;    
+;    movf    UNI,W
+;    movwf   UNI+4
+;    
+;    movf    DECE,W
+;    movwf   DECE+4
+;    
+;   ; call    disp_mood_on
+;    goto    loop
+;    
+;mood4:
+;    bsf	    PORTE,0
+;    bsf	    PORTE,1
+;    bsf	    PORTE,2
+;    
+;    btfss   PORTB,1
+;    call    acep
+;    
+;    btfss   PORTB,2
+;    call    rech
+;    
+;    goto loop
+;    
+;    
+;moodm:
+;    clrf    mood
+;    goto    loop
+;    
+;acep:
+;    btfss   PORTB,1
+;    goto    $-1
+;    clrf    mood
+;    
+;    movf    Tsema1,W
+;    movwf   CONT
+;    
+;    movf    Tsema2,W
+;    movwf   CONT+1
+;    
+;    movf    Tsema3,W
+;    movwf   CONT+2
+;    goto    loop
+;    
+;rech:
+;    btfss   PORTB,2
+;    goto    $-1
+;    clrf    mood
+;    goto    loop
+;    //</editor-fold>
 
    
   ;-------------------------sub rutinas-----------------------------------------
@@ -622,10 +613,8 @@ io:
      
     banksel TRISA 
     clrf TRISA
-    bsf	 TRISB,0
-    bsf	 TRISB,1
-    bsf	 TRISB,2
-    bcf	 TRISB,3
+    movlw 007h
+    movwf TRISB
     clrf TRISC
     clrf TRISD
     clrf TRISE
@@ -716,215 +705,252 @@ coninten:
    
     return
     //</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="SEMAFORO">
-V1:
+  
+;//<editor-fold defaultstate="collapsed" desc="DISPLAYS">
+;dison2: 
+;			    ; aqui se preparan los displays, quiere decir que se coloca el valor que corresponde a cada 1
+;    movwf   UNI+1,W
+;    call    tabla
+;    movwf   dise
+;    
+;    movwf   DECE+1,W
+;    call    tabla
+;    movwf   dise+1
+;    
+;    movwf   UNI+2,W
+;    call    tabla
+;    movwf   dise+2
+;    
+;    movwf   DECE+2,W
+;    call    tabla
+;    movwf   dise+3
+;    
+;    movwf   UNI+3,W
+;    call    tabla
+;    movwf   dise+4
+;    
+;    movwf   DECE+3,W
+;    call    tabla
+;    movwf   dise+5
+;    
+;    movwf   UNI+4
+;    call    tabla
+;    movwf   dise+6
+;    
+;    movwf   DECE+4,W
+;    call    tabla
+;    movwf   dise+7
+;    return
+;    
+;    //</editor-fold>
     
-    call    VALSEMA
-    call    DISPSEMA
-    
-    bcf	    PORTB,3
-    bcf	    PORTA,0
-    bcf	    PORTA,7
-    bsf	    PORTA,2
-    bsf	    PORTA,3
-    bsf	    PORTA,6
-   
-    movlw    6
-    subwf    SEMA2,W
-   
-    btfsc    STATUS,2
-    call     V1P
-    return
-   
-V1P:
-    bcf	    CONT,0
-    bsf	    CONT,1
-    return
-    
-VI1:
-   
-    call    VALSEMA
-    call    DISPSEMA
-    
-    btfss   INTER,0
-    bcf	    PORTA,2
-    
-    btfsc   INTER,0
-    bsf	    PORTA,2
-    
-    movlw   3
-    subwf   SEMA2,W
-    
-    btfsc   STATUS,2
-    call    A1P
-    return
-    
-A1P:
-    bcf	    CONT,1
-    bsf	    CONT,2
-    return
-
-A1:
-    
-    call    VALSEMA
-    call    DISPSEMA
-    
-    bcf	    PORTA,2
-    bsf	    PORTA,1
-    
-    movf    TVIA+1,W
-    subwf   SEMA3,W
-    
-    btfsc   STATUS,2
-    call    V2P
-    return
-    
-V2P:
-    bcf	    CONT,2
-    bsf	    CONT,3
-    
-    movf    TVIA+1,W
-    movwf   SEMA2
-    
-    addwf   TVIA+2,W
-    movwf   SEMA1
-    return
-    
-V2:
-    call    VALSEMA
-    call    DISPSEMA
-    
-    bcf	    PORTA,1
-    bcf	    PORTA,3
-    bsf	    PORTA,0
-    bsf	    PORTA,5
-    
-    movlw   6
-    subwf   SEMA3,W
-    
-    btfsc   STATUS,2
-    call    PI2
-    return
-
-PI2:
-    bcf	    CONT,3
-    bsf	    CONT,4
-    return
-    
-VI2:	
-    call    VALSEMA
-    call    DISPSEMA
-    
-    btfss   INTER,0
-    bcf	    PORTA,5
-    
-    btfsc   INTER,0
-    bsf	    PORTA,5
-    
-    movlw   3
-    subwf   SEMA3,W
-    
-    btfsc   STATUS,2
-    call    A2P
-    return
-    
-A2P:
-    bcf	    CONT,4
-    bsf	    CONT,5
-    return
-
-A2:
-    call    VALSEMA
-    call    DISPSEMA
-    
-    bcf	    PORTA,5
-    bsf	    PORTA,4
-    
-    movf    TVIA+2,W
-    subwf   SEMA1,W
-    
-    btfsc   STATUS,2
-    call    V3P
-    return
-    
-V3P:
-    bcf	    CONT,5
-    bsf	    CONT,6
-    
-    movf    TVIA+2,W
-    movwf   SEMA3
-    
-    addwf   TVIA,W
-    movwf   SEMA2
-    return
-    
-V3:
-    call    VALSEMA
-    call    DISPSEMA
-    bcf	    PORTA,4
-    bcf	    PORTA,6
-    bsf	    PORTA,3
-    bsf	    PORTB,3
-    
-    movlw   6
-    subwf   SEMA1,W
-    
-    btfsc   STATUS,2
-    call    PI3
-    return
-
-PI3:
-    bcf	    CONT,6
-    bsf	    CONT,7
-    return
-    
-VI3:
-    call    VALSEMA
-    call    DISPSEMA
-    btfss   INTER,0
-    bcf	    PORTB,3
-    
-    btfsc   INTER,0
-    bsf	    PORTB,3
-    
-    movlw   3
-    subwf   SEMA1,W
-    
-    btfsc   STATUS,2
-    call    A3P
-    return
-    
-A3P:
-    bcf	    CONT,7
-    bsf	    CONT+1,0
-    return
-
-A3:
-    call    VALSEMA
-    call    DISPSEMA
-    bcf	    PORTB,3
-    bsf	    PORTA,7
-    
-    movf    TVIA,W
-    subwf   SEMA2,W
-    
-    btfsc   STATUS,2
-    call    V4P
-    return
-    
-V4P:
-    bcf	    CONT+1,0
-    bsf	    CONT,0
-    
-    movf    TVIA,W
-    movwf   SEMA1
-    
-    addwf   TVIA+1,W
-    movwf   SEMA3
-    
-    return
-    //</editor-fold>
+;//<editor-fold defaultstate="collapsed" desc="SEMAFORO">
+;V1:
+;    
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    bcf	    PORTB,0
+;    bcf	    PORTA,0
+;    bcf	    PORTA,7
+;    bsf	    PORTA,2
+;    bsf	    PORTA,3
+;    bsf	    PORTA,6
+;   
+;    movlw    6
+;    subwf    SEMA2,W
+;   
+;    btfsc    STATUS,2
+;    call     V1P
+;    return
+;   
+;V1P:
+;    bcf	    CONT,0
+;    bsf	    CONT,1
+;    return
+;    
+;VI1:
+;   
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    btfss   INTER,0
+;    bcf	    PORTA,2
+;    
+;    btfsc   INTER,0
+;    bsf	    PORTA,2
+;    
+;    movlw   3
+;    subwf   SEMA2,W
+;    
+;    btfsc   STATUS,2
+;    call    A1P
+;    return
+;    
+;A1P:
+;    bcf	    CONT,1
+;    bsf	    CONT,2
+;    return
+;
+;A1:
+;    
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    bcf	    PORTA,2
+;    bsf	    PORTA,1
+;    
+;    movf    TVIA+1,W
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    V2P
+;    return
+;    
+;V2P:
+;    bcf	    CONT,2
+;    bsf	    CONT,3
+;    
+;    movf    TVIA+1,W
+;    movwf   SEMA2
+;    
+;    addwf   TVIA+2,W
+;    movwf   SEMA1
+;    return
+;    
+;V2:
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    bcf	    PORTA,1
+;    bcf	    PORTA,3
+;    bsf	    PORTA,0
+;    bsf	    PORTA,5
+;    
+;    movlw   6
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    PI2
+;    return
+;
+;PI2:
+;    bcf	    CONT,3
+;    bsf	    CONT,4
+;    return
+;    
+;VI2:	
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    btfss   INTER,0
+;    bcf	    PORTA,5
+;    
+;    btfsc   INTER,0
+;    bsf	    PORTA,5
+;    
+;    movlw   3
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    A2P
+;    return
+;    
+;A2P:
+;    bcf	    CONT,4
+;    bsf	    CONT,5
+;    return
+;
+;A2:
+;    call    VALSEMA
+;    call    DISPSEMA
+;    
+;    bcf	    PORTA,5
+;    bsf	    PORTA,4
+;    
+;    movf    TVIA+1,W
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    V3P
+;    return
+;    
+;V3P:
+;    bcf	    CONT,5
+;    bsf	    CONT,6
+;    
+;    movf    TVIA+1,W
+;    movwf   SEMA2
+;    
+;    addwf   TVIA+2,W
+;    movwf   SEMA1
+;    return
+;    
+;V3:
+;    call    VALSEMA
+;    call    DISPSEMA
+;    bcf	    PORTA,4
+;    bcf	    PORTA,6
+;    bsf	    PORTA,3
+;    bsf	    PORTB,3
+;    
+;    movlw   6
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    PI3
+;    return
+;
+;PI3:
+;    bcf	    CONT,6
+;    bsf	    CONT,7
+;    return
+;    
+;VI3:
+;    call    VALSEMA
+;    call    DISPSEMA
+;    btfss   INTER,0
+;    bcf	    PORTB,3
+;    
+;    btfsc   INTER,0
+;    bsf	    PORTB,3
+;    
+;    movlw   3
+;    subwf   SEMA3,W
+;    
+;    btfsc   STATUS,2
+;    call    A3P
+;    return
+;    
+;A3P:
+;    bcf	    CONT,7
+;    bsf	    CONT+1,0
+;    return
+;
+;A3:
+;    call    VALSEMA
+;    call    DISPSEMA
+;    bcf	    PORTB,3
+;    bsf	    PORTA,7
+;    
+;    movf    TVIA,W
+;    subwf   SEMA2,W
+;    
+;    btfsc   STATUS,2
+;    call    V4P
+;    return
+;    
+;V4P:
+;    bcf	    CONT+1,0
+;    bsf	    CONT,0
+;    
+;    movf    TVIA,W
+;    movwf   SEMA1
+;    
+;    addwf   TVIA+1,W
+;    movwf   SEMA3
+;    return
+;    //</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="VALORES">
 VALSEMA:
@@ -983,23 +1009,20 @@ DISPSEMA:
     return
     //</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="Displays de modos">
-DISPMOOD:
-    movwf   UNI+4,W
-    call    tabla
-    movwf   dise+6
-    
-    movwf   DECE+4,W
-    call    tabla
-    movwf   dise+7
-    return
-   //</editor-fold>
+;//<editor-fold defaultstate="collapsed" desc="Displays de modos">
+;DISPMOOD:
+;    movwf   UNI+4,W
+;    call    tabla
+;    movwf   dise+6
+;    
+;    movwf   DECE+4,W
+;    call    tabla
+;    movwf   dise+7
+;    return
+;    //</editor-fold>
 
 
 end
-
-
-
 
 
 

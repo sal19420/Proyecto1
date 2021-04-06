@@ -63,7 +63,13 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
-      <item path="Proyecto1.s" ex="true" overriding="false">
+      <item path="Proyecto1.s" ex="false" overriding="false">
+        <pic-as-assembler>
+        </pic-as-assembler>
+        <pic-as-global>
+        </pic-as-global>
+        <pic-as-linker>
+        </pic-as-linker>
       </item>
       <Simulator>
         <property key="codecoverage.enabled" value="Disable"/>
